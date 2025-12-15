@@ -3,29 +3,38 @@ import clip
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator
 from PIL import Image
 import numpy as np
+import os
 
-
+# Configuration
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 def get_device():
     return DEVICE
 
 
+
+
+
 # Loads both CLIP and SAM
 def load_models(sam_checkpoint="sam_vit_b_01ec64.pth", model_type="vit_b"):
-    
+
     print(f"Loading models on {DEVICE}...")
     
-    # Load CLIP
-    # ViT-B/16 is a standard, good balance of speed/performance
+    if not os.path.exists(sam_checkpoint):
+        raise FileNotFoundError(f"SAM Checkpoint not found at: {sam_checkpoint}. Please download it.")
+
+    # 1. Load CLIP
+    # Returns (model, preprocess)
     clip_model, clip_preprocess = clip.load("ViT-B/16", device=DEVICE)
     clip_model.eval()
 
-    # Load SAM
+    # 2. Load SAM
+    print("Loading SAM...")
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
     sam.to(device=DEVICE)
     
-    # this generator runs over the whole image and finds all masks
+    # 3. Create Mask Generator
+    # This should return a SamAutomaticMaskGenerator object
     mask_generator = SamAutomaticMaskGenerator(sam)
 
     print("Models loaded successfully.")
@@ -35,12 +44,10 @@ def load_models(sam_checkpoint="sam_vit_b_01ec64.pth", model_type="vit_b"):
 
 
 
-
 def crop_image_from_mask(image_pil, mask_dict, expansion=0):
 
     x, y, w, h = mask_dict['bbox']
     
-    # Optional: Expand box slightly to capture context (not strictly necessary but helpful)
     width, height = image_pil.size
     x = max(0, x - expansion)
     y = max(0, y - expansion)
@@ -56,14 +63,15 @@ def crop_image_from_mask(image_pil, mask_dict, expansion=0):
 
 
 
-
-
 def get_image_paths(dataset_root, n_images_per_class=50):
-
     import os
     import random
     
     image_paths = []
+    if not os.path.exists(dataset_root):
+        print(f"ERROR: Dataset root {dataset_root} does not exist!")
+        return []
+
     classes = os.listdir(dataset_root)
     
     for class_name in classes:
@@ -74,7 +82,6 @@ def get_image_paths(dataset_root, n_images_per_class=50):
         all_imgs = [os.path.join(class_dir, f) for f in os.listdir(class_dir) 
                     if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
         
-        # Shuffle and pick N
         random.shuffle(all_imgs)
         selected = all_imgs[:n_images_per_class]
         image_paths.extend(selected)
