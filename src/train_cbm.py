@@ -13,7 +13,7 @@ CONCEPT_BANK_PATH = "artifacts/concepts/concept_bank.pt"
 MODEL_SAVE_PATH = "artifacts/models/dcbm_model.pth"
 
 BATCH_SIZE = 128
-EPOCHS = 20           # It converges fast because we only train one layer
+EPOCHS = 10           # It converges fast because we only train one layer
 LEARNING_RATE = 0.01  # Higher LR is okay for linear layers
 LAMBDA_SPARSITY = 0.0001 # The 'L1' penalty strength (Paper suggests 1e-4)
 
@@ -53,6 +53,7 @@ class DCBM(nn.Module):
 
         with torch.no_grad():
             img_features = self.clip_model.encode_image(x)  
+            img_features = img_features.float()  # CLIP uses fp16 by default, convert to fp32 for stability
             img_features = img_features / img_features.norm(dim=-1, keepdim=True)
 
             # This is the blue matrix from Paper (Image @ Concept Bank^T)
@@ -72,7 +73,7 @@ def main():
 
     train_dataset = datasets.ImageFolder(
         root=os.path.join(DATASET_ROOT, 'train'),
-        trasnform = preprocess_fn
+        transform = preprocess_fn
     )
 
     val_dataset = datasets.ImageFolder(
