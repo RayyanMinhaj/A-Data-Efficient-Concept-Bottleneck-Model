@@ -9,10 +9,11 @@ The pipeline extracts small segment-based visual "concepts", clusters them into 
 
 ```
 Cross-Modal-Multi-Task-Learning/
-├── generate_concepts.py   #segment images, extract CLIP embeddings and build a concept bank (saved to `artifacts/concepts`).    
-├── train_cbm.py - #train the concept-bottleneck classifier using the concept bank and ImageNet-like dataset (saves model to `artifacts/models`). 
-├── inference.py        #run a demo inference and print an explanation of why a prediction was made.      
-├── utils.py       #helper functions (device, loading models, image utils).
+├── src/
+│   ├── generate_concepts.py   #segment images, extract CLIP embeddings and build a concept bank (saved to `artifacts/concepts`).    
+│   ├── train_cbm.py - #train the concept-bottleneck classifier using the concept bank and ImageNet-like dataset (saves model to `artifacts/models`).
+│   ├── inference.py        #run a demo inference and print an explanation of why a prediction was made.
+│   ├── utils.py       #helper functions (device, loading models, image utils).
 ├── data/                            
 │   ├── imagenette2/                          
 ├── artifacts/                          
@@ -77,4 +78,5 @@ Why? Because I saw:
 Simple permissive use for research/experimentation. No warranty.
 
 ---
+
 
