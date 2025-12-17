@@ -9,11 +9,10 @@ The pipeline extracts small segment-based visual "concepts", clusters them into 
 
 ```
 Cross-Modal-Multi-Task-Learning/
-├── src/
-│   ├── generate_concepts.py   #segment images, extract CLIP embeddings and build a concept bank (saved to `artifacts/concepts`).    
-│   ├── train_cbm.py - #train the concept-bottleneck classifier using the concept bank and ImageNet-like dataset (saves model to `artifacts/models`).
-│   ├── inference.py        #run a demo inference and print an explanation of why a prediction was made.
-│   ├── utils.py       #helper functions (device, loading models, image utils).
+├── generate_concepts.py   #segment images, extract CLIP embeddings and build a concept bank (saved to `artifacts/concepts`).    
+├── train_cbm.py - #train the concept-bottleneck classifier using the concept bank and ImageNet-like dataset (saves model to `artifacts/models`). 
+├── inference.py        #run a demo inference and print an explanation of why a prediction was made.      
+├── utils.py       #helper functions (device, loading models, image utils).
 ├── data/                            
 │   ├── imagenette2/                          
 ├── artifacts/                          
@@ -68,6 +67,12 @@ Why? Because I saw:
  - Concept 0383 ('hose'): Activation 0.74 (Impact: 1.02)
 ```
 
+Where:
+- Prediciton percentage is the confidence of the model's certainty.
+- Multiple concepts represent the different centroids (i.e., the different **segments** of an image clustered as one). Sorted by Impact and displayed only the top 5.
+- Activation is how clearly the concept appears in the image.
+- Impact is (Activation x Weight), telling us how much the concept contributed to the final prediction. 
+
 
 ## Notes
 - Scripts use a few hard-coded paths (dataset root, concept bank path, model path). Edit the constants at the top of each script if your files are in different locations.
@@ -78,5 +83,4 @@ Why? Because I saw:
 Simple permissive use for research/experimentation. No warranty.
 
 ---
-
 
